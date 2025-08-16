@@ -1,0 +1,23 @@
+[project]
+name = "wrlc-azure-storage-service"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Tom Boone",email = "tbc@tomboone.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "azure-core (>=1.35.0,<2.0.0)",
+    "azure-data-tables (>=12.7.0,<13.0.0)",
+    "azure-storage-blob (>=12.26.0,<13.0.0)",
+    "azure-storage-queue (>=12.13.0,<13.0.0)"
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-mock = "^3.14.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
