@@ -23,13 +23,25 @@ from wrlc_azure_storage_service.config import STORAGE_CONNECTION_STRING
 class StorageService:
     """Service for Azure Storage operations."""
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, storage_connection_string: Optional[str] = None) -> None:
+        """
+        Initializes the StorageService.
+        Args:
+            storage_connection_string: The Azure Storage connection string.
+                                       If None, it's retrieved from the
+                                       STORAGE_CONNECTION_STRING env var.
+        """
+        self.connection_string = storage_connection_string or STORAGE_CONNECTION_STRING
+        if not self.connection_string:
+            raise ValueError(
+                "Storage connection string not found. "
+                "Please provide it or set the STORAGE_CONNECTION_STRING environment variable."
+            )
 
     def get_blob_service_client(self) -> BlobServiceClient:
         """Returns an authenticated BlobServiceClient instance."""
         try:
-            return BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+            return BlobServiceClient.from_connection_string(self.connection_string)
         except ValueError as e:
             logging.error(
                 msg=f"StorageService.get_blob_service_client: Invalid storage connection string format: {e}"
@@ -43,7 +55,7 @@ class StorageService:
             # Adjust policy if needed based on your specific binding configurations.
             # If using raw strings, set message_encode_policy=None, message_decode_policy=None.
             return QueueServiceClient.from_connection_string(
-                conn_str=STORAGE_CONNECTION_STRING,
+                conn_str=self.connection_string,
                 message_encode_policy=TextBase64EncodePolicy(),  # Encodes outgoing messages to Base64
             )
         except ValueError as e:
@@ -56,7 +68,7 @@ class StorageService:
         """Returns an authenticated TableServiceClient instance."""
         try:
             return TableServiceClient.from_connection_string(
-                conn_str=STORAGE_CONNECTION_STRING
+                conn_str=self.connection_string
             )
         except ValueError as e:
             logging.error(
@@ -80,7 +92,7 @@ class StorageService:
         try:
             # Inherits policy from service client if created that way, or specify explicitly
             return QueueClient.from_connection_string(
-                STORAGE_CONNECTION_STRING,
+                self.connection_string,
                 queue_name,
                 message_encode_policy=TextBase64EncodePolicy(),
             )
